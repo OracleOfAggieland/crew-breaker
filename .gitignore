@@ -1,0 +1,18 @@
+# Dependencies and caches
+node_modules/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.hypothesis/
+
+# Local environment
+.env
+.env.*
+
+# OS and editor
+.DS_Store
+Thumbs.db
+
+# Note: ui/dist/ is committed on purpose. Kiro Crew installs an app by copying
+# the repo, so the built page has to be in it.
