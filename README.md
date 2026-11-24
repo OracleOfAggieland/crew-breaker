@@ -47,14 +47,18 @@ Rules it keeps, all taken from the design:
 kirocrew app install https://github.com/OracleOfAggieland/crew-breaker
 ```
 
-Then open the app's page in the dashboard (Discover, or `/apps/detail/breaker`), press Enable and accept the trust prompt. Kiro Crew asks because a third-party app's backend runs inside the gateway with the gateway's own access. The prompt lists what Breaker asks for:
+Then open the app's page in the dashboard (`/apps/detail/breaker`), press Enable and accept the trust prompt. Kiro Crew asks because a third-party app's backend runs inside the gateway with the gateway's own access, and it has not reviewed this app's code. Read the code first if you like; the backend is about 2,100 lines of Python. The prompt lists what Breaker asks for:
 
 - chat sessions of its own, for work started from Breaker;
 - `GET /api/sessions/memory`, to see running subagents and their parent sessions;
 - `/api/autonudge`, to see goal loops and, from the page, to pause one;
 - its own routes under `/api/apps/breaker`.
 
+![The trust prompt Kiro Crew shows before Breaker runs](docs/img/trust.jpg)
+
 Breaker reads Crew's usage files (`usage/tokens/*.jsonl` under the data home) and writes only to its own data folder.
+
+To update later, pull the checkout that `kirocrew app install` printed and run `kirocrew app update breaker`. On Windows that command isn't available, so press Sync on the app's page.
 
 ## Use
 
@@ -118,11 +122,11 @@ The rest run the backend against real usage files in a temporary folder and a st
 
 Checked on Nov 24, 2026 in a real Kiro Crew v0.13.1 gateway on Windows, on the stand-in backend above:
 
-- **Install and trust.** The app installs, the trust prompt lists exactly the permissions above, and the backend's hooks load.
-- **A run Breaker started.** With a limit of 100 it was warned at 88 and tripped at 100. Breaker removed its loop (Crew's log: `stopped — reason='credit_cap' (cycles 5/6)`), and nothing was billed afterward.
+- **Install and trust.** Installed from this repo's git URL with the command above. The trust prompt lists exactly the permissions above, and the backend's hooks load.
+- **A run Breaker started.** With a limit of 100 it was warned at 88 and tripped at 100. Breaker removed its loop (Crew's log: `stopped — reason='credit_cap' (cycles 5/6)`), and nothing was billed afterward. A second run, started from the New run form with a limit of 60, tripped at 63. After its limit was raised to 200 it stayed tripped until Restart, which armed its loop again for the one cycle that was left.
 - **A loop the owner started.** With a limit of 70 and a loop billing 30 a cycle, the cap tripped at 90. The open Breaker page paused the loop one second later, at cycle 3 of 8, and nothing was billed afterward.
 - **A real subagent.** A session at 90 credits started a subagent. Breaker showed it under that session while it ran, counted its first 10 credits live (total 100), and settled at 110 when its row was written. That row names no parent.
-- **The page.** All five tabs, the cap editor, the New run form and Restart.
+- **The page.** All five tabs, the cap editor, the New run form and Restart, in the light and dark themes.
 
 Not checked:
 
