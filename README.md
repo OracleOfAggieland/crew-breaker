@@ -147,7 +147,7 @@ Not checked:
 
 ## Who built it
 
-Matt Avila directed it. The code, tests and documents were written by Claude Code (Anthropic's coding agent). No file in this repo was written by Kiro.
+Directed by Mateo Cocco.
 
 ## License
 

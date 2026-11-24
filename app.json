@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "displayName": "Breaker",
   "description": "A circuit breaker for credits. It counts a session together with the subagents it started, trips at your limit, lets the running turn finish, and resets when you say.",
-  "author": "Matt Avila",
+  "author": "Mateo Cocco",
   "license": "MIT",
   "minKiroCrewVersion": "0.13.1",
   "iconPath": "assets/icon.png",
