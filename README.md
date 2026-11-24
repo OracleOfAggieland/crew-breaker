@@ -4,7 +4,7 @@
 
 ![Three sessions in Breaker: one armed, two tripped, one with its subagent's credits counted](docs/img/sessions.jpg)
 
-Breaker is an app for [Kiro Crew](https://github.com/kirodotdev/KiroCrew) v0.13.1. It runs inside the gateway, on macOS, Linux and Windows.
+Breaker is an app for [Kiro Crew](https://github.com/kirodotdev/KiroCrew) v0.13.1. It runs inside the gateway. It declares macOS, Linux and Windows, and so far it has run on Windows only, on a stand-in model backend (see [what has been checked](#what-has-been-checked-and-what-hasnt)).
 
 ## Why
 
