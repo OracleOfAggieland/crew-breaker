@@ -1,7 +1,7 @@
 """The replay of the runaway reported on KiroCrew#6338."""
 
-from breaker_core import replay
-from breaker_core.replay import (
+from backend.breaker_core import replay
+from backend.breaker_core.replay import (
     CYCLES,
     LOOP,
     OWN_PER_CYCLE,

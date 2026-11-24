@@ -110,6 +110,7 @@ class Ledger:
         self.surface: dict[str, str] = {}
         self.app: dict[str, str] = {}
         self.parent_of: dict[str, str] = {}
+        self.children_of: dict[str, list[str]] = {}
         self.live_peak: dict[str, float] = {}
         self.running: set[str] = set()
         self.rows_folded = 0
@@ -162,6 +163,7 @@ class Ledger:
         if self.root_of(parent) == child:
             return
         self.parent_of[child] = parent
+        self.children_of.setdefault(parent, []).append(child)
 
     # ---- reading -----------------------------------------------------------
 
@@ -189,7 +191,17 @@ class Ledger:
 
     def descendants(self, session: str) -> list[str]:
         """Every run spawned under ``session``, at any depth."""
-        return sorted(k for k in self.parent_of if k != session and self.root_or_ancestor(k, session))
+        found: list[str] = []
+        seen = {session}
+        stack = list(self.children_of.get(session, ()))
+        while stack:
+            key = stack.pop()
+            if key in seen:
+                continue
+            seen.add(key)
+            found.append(key)
+            stack.extend(self.children_of.get(key, ()))
+        return sorted(found)
 
     def root_or_ancestor(self, key: str, ancestor: str) -> bool:
         """Whether ``ancestor`` sits above ``key`` in the spawn chain."""

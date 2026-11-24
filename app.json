@@ -1,0 +1,56 @@
+{
+  "name": "breaker",
+  "version": "0.1.0",
+  "displayName": "Breaker",
+  "description": "A circuit breaker for credits. It counts a session together with the subagents it started, trips at your limit, lets the running turn finish, and resets when you say.",
+  "author": "Matt Avila",
+  "license": "MIT",
+  "minKiroCrewVersion": "0.13.1",
+  "iconPath": "assets/icon.png",
+  "tags": ["credits", "budget", "usage", "subagents"],
+  "highlights": [
+    "A session's true total: its own turns plus every subagent it started",
+    "A shadow cap that reports when a limit would have tripped, and stops nothing",
+    "A real cap on work started from Breaker, held with no page open",
+    "A real cap on your own goal loops, held while a Breaker page is open",
+    "A replay of a reported overspend, with and without subagents counted"
+  ],
+  "useCases": [
+    "When you leave a goal loop running overnight, start it from Breaker with a credit limit, so it stops before its next cycle once the limit is reached",
+    "When you want to know what a cap would have done, set a shadow cap on a session and read when it would have tripped and how far spend ran past it",
+    "When a session's spend looks too low, open Breaker to see what its subagents added"
+  ],
+  "links": [
+    { "label": "Source", "url": "https://github.com/OracleOfAggieland/crew-breaker" }
+  ],
+  "platform": {
+    "os": ["macos", "linux", "windows"]
+  },
+  "backend": {
+    "hooks": {
+      "routes": "backend.routes:register",
+      "on_startup": "backend.routes:on_startup",
+      "on_shutdown": "backend.routes:on_shutdown"
+    }
+  },
+  "ui": {
+    "entry": "dist/index.mjs",
+    "pages": [
+      {
+        "route": "/apps/breaker",
+        "label": "Breaker",
+        "icon": "Zap"
+      }
+    ]
+  },
+  "permissions": {
+    "api": [
+      "/api/apps/breaker",
+      "/api/apps/breaker/*",
+      "=/api/sessions/memory",
+      "/api/autonudge",
+      "/api/autonudge/*"
+    ],
+    "chatSlots": true
+  }
+}

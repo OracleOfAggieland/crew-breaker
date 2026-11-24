@@ -2,7 +2,7 @@
 
 import json
 
-from breaker_core import (
+from backend.breaker_core import (
     ARMED,
     ENFORCE,
     SHADOW,
