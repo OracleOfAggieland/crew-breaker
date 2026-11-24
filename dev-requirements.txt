@@ -1,0 +1,5 @@
+# Test tooling only. Breaker itself needs nothing beyond what the Kiro Crew
+# gateway ships. (This file is deliberately not named requirements.txt:
+# Crew would try to install that into the gateway.)
+pytest>=8
+hypothesis>=6.100
