@@ -4,7 +4,7 @@
 
 ![Three sessions in Breaker: one armed, two tripped, one with its subagent's credits counted](docs/img/sessions.jpg)
 
-Breaker is an app for [Kiro Crew](https://github.com/kirodotdev/KiroCrew) v0.13.1. It runs inside the gateway. It declares macOS, Linux and Windows, and so far it has run on Windows only, on a stand-in model backend (see [what has been checked](#what-has-been-checked-and-what-hasnt)).
+Breaker is an app for [Kiro Crew](https://github.com/kirodotdev/KiroCrew) v0.13.1. It runs inside the gateway. It declares macOS, Linux and Windows, and so far it has run on Windows only: most checks on a stand-in model backend, and two short loops on real Kiro credits (see [what has been checked](#what-has-been-checked-and-what-hasnt)).
 
 ## Why
 
@@ -128,11 +128,18 @@ Checked on Nov 24, 2026 in a real Kiro Crew v0.13.1 gateway on Windows, on the s
 - **A real subagent.** A session at 90 credits started a subagent. Breaker showed it under that session while it ran, counted its first 10 credits live (total 100), and settled at 110 when its row was written. That row names no parent.
 - **The page.** All five tabs, the cap editor, the New run form and Restart, in the light and dark themes.
 
+Checked the same day on real Kiro credits, with the gateway pointed at a signed-in kiro-cli 3.5.0 on the `auto` model (Crew v0.13.1 notes that this kiro-cli is newer than the releases it was verified on):
+
+- **The meter.** Eleven real turns billed 1.2433 credits, between 0.08 and 0.23 a turn. Breaker's totals matched Crew's usage rows to the last digit.
+- **A cap changed while the loop ran.** A run started with a limit of 1 had its limit lowered to 0.6 after two turns. It was warned at 0.58 and tripped at 0.66, and Breaker removed its loop.
+- **A trip in the middle of a loop.** A run with a limit of 0.4 and eight cycles allowed was warned at 0.36 and tripped at 0.58 after its fifth turn. Breaker removed the loop with four cycles left (Crew's log: `stopped — reason='credit_cap' (cycles 4/8)`), and nothing was billed afterward. The 0.18 past the limit is the one turn that crossed it: a cap acts between turns.
+- **A gateway restart.** The gateway was stopped and started between the two sets of checks. Totals, caps and trips came back, and no row was counted twice.
+
 Not checked:
 
-- **Real kiro-cli billing.** Every credit above came from the stand-in. It reports credits in the frame Crew's source reads them from, and nothing has run on a real Kiro account.
+- **Subagents on real credits.** The subagent check ran on the stand-in. The real runs started no subagents.
 - **macOS and Linux.** The code has no Windows-only path, and it has only run on Windows.
-- **A gateway restart in the middle of a run,** beyond the unit test that saves and reloads the state.
+- **A gateway restart in the middle of a run.** The restart above happened between runs.
 - **Many subagents at once, and subagents of subagents,** beyond the property tests.
 - **A large usage log.** The reader keeps its place in each file, and its speed on months of rows is unmeasured.
 

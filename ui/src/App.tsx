@@ -407,7 +407,7 @@ function CapEditor({ session, onDone }: { session: Session; onDone: () => Promis
       <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
         <label htmlFor={`limit-${session.session}`} style={{ fontSize: 13 }}>Credit limit for this session and its subagents</label>
         <div style={{ width: 140, display: 'flex' }}>
-          <Input id={`limit-${session.session}`} type="number" min={1} value={limit} onChange={event => setLimit(event.target.value)} placeholder="e.g. 5000" />
+          <Input id={`limit-${session.session}`} type="number" min={0} step="any" value={limit} onChange={event => setLimit(event.target.value)} placeholder="e.g. 5000" />
         </div>
         <SegmentedControl
           ariaLabel="Cap mode"
@@ -495,7 +495,7 @@ function StartRun({ state, onStarted }: { state: State | null; onStarted: () => 
         <div style={{ display: 'grid', gap: 12, alignItems: 'start', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
           <label style={field}>
             Credit limit
-            <div style={{ display: 'flex' }}><Input type="number" min={1} value={limit} onChange={event => setLimit(event.target.value)} /></div>
+            <div style={{ display: 'flex' }}><Input type="number" min={0} step="any" value={limit} onChange={event => setLimit(event.target.value)} /></div>
           </label>
           <label style={field}>
             Most cycles

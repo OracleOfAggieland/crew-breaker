@@ -1,10 +1,12 @@
 const whole = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 })
 const fine = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 })
+const finer = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 })
 
-/** A credit amount: whole above 100, one decimal below. */
+/** A credit amount: whole from 100, one decimal from 10, two below. A real turn can cost under a tenth of a credit. */
 export function credits(value: number): string {
   if (!Number.isFinite(value)) return '-'
-  return Math.abs(value) >= 100 ? whole.format(value) : fine.format(value)
+  const size = Math.abs(value)
+  return size >= 100 ? whole.format(value) : size >= 10 ? fine.format(value) : finer.format(value)
 }
 
 /** A time the reader can place: "08:14" today, "Nov 23, 08:14" otherwise. */

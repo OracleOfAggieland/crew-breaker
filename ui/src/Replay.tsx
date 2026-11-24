@@ -73,7 +73,7 @@ export function ReplayView() {
           <label htmlFor="replay-limit" style={{ fontSize: 13, whiteSpace: 'nowrap' }}>
             Credit limit
           </label>
-          <Input id="replay-limit" type="number" min={1} value={limit} onChange={event => setLimit(event.target.value)} />
+          <Input id="replay-limit" type="number" min={0} step="any" value={limit} onChange={event => setLimit(event.target.value)} />
           <Btn type="submit" busy={busy}>
             Replay
           </Btn>
