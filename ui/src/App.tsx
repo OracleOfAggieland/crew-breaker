@@ -139,14 +139,12 @@ export default function Breaker() {
           <StatCard label="Tripped" value={state ? tripped.length : null} />
         </div>
         <div style={{ marginBottom: 14 }}>
-          <SegmentedControl
-            ariaLabel="Breaker views"
-            layoutId="breaker-tabs"
+          <Tabs
             value={tab}
             onChange={setTab}
-            segments={[
+            tabs={[
               { key: 'sessions', label: 'Sessions' },
-              { key: 'start', label: 'Start under a breaker' },
+              { key: 'start', label: 'New run' },
               { key: 'replay', label: 'Replay' },
               { key: 'history', label: 'History' },
               { key: 'limits', label: "What it can't do" },
@@ -160,6 +158,35 @@ export default function Breaker() {
         {tab === 'limits' && <Limits />}
       </div>
     </>
+  )
+}
+
+// The page's own tab strip. The host's segmented control sizes its labels once,
+// when it mounts, and clips them if the page's font arrives after that.
+function Tabs<T extends string>({ value, onChange, tabs }: { value: T; onChange: (key: T) => void; tabs: { key: T; label: string }[] }) {
+  return (
+    <div role="tablist" aria-label="Breaker views" style={{ display: 'inline-flex', flexWrap: 'wrap', gap: 2, padding: 3, border: '1px solid var(--border)', borderRadius: 8, background: 'var(--card)' }}>
+      {tabs.map(tab => {
+        const on = tab.key === value
+        return (
+          <button
+            key={tab.key}
+            type="button"
+            role="tab"
+            aria-selected={on}
+            onClick={() => onChange(tab.key)}
+            style={{
+              font: 'inherit', fontSize: 12, whiteSpace: 'nowrap', cursor: 'pointer', padding: '5px 12px', borderRadius: 6,
+              border: `1px solid ${on ? 'var(--accent)' : 'transparent'}`,
+              background: on ? 'var(--bg-hover, transparent)' : 'transparent',
+              color: on ? 'var(--accent)' : 'var(--text)',
+            }}
+          >
+            {tab.label}
+          </button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -218,7 +245,7 @@ function Sessions({ state, onChanged }: { state: State | null; onChanged: () => 
                       {session.owned && <Badge variant="aim" title="Started from Breaker; it owns this session">Started from Breaker</Badge>}
                       {session.orphan_run && <Badge variant="muted" title="A subagent whose session Breaker never saw: it started and ended between two looks">Subagent, session unknown</Badge>}
                       {session.bills_in_dollars && <Badge variant="muted" title="This harness bills in dollars. Breaker caps credits only.">Bills in dollars: not capped</Badge>}
-                      {session.loop && <Badge variant="muted" title="A goal loop is armed on this session">{session.loop.active ? 'Loop running' : 'Loop paused'}, cycle {session.loop.cycle_count}{session.loop.max_cycles ? ` of ${session.loop.max_cycles}` : ''}</Badge>}
+                      {session.loop && <Badge variant="muted" title="A goal loop is armed on this session">{session.loop.active ? 'Loop running' : session.loop.max_cycles > 0 && session.loop.cycle_count >= session.loop.max_cycles ? 'Loop finished' : 'Loop paused'}, cycle {session.loop.cycle_count}{session.loop.max_cycles ? ` of ${session.loop.max_cycles}` : ''}</Badge>}
                     </div>
                   </td>
                   <td style={num}>{credits(session.own)}</td>
@@ -298,11 +325,11 @@ function TripLine({ cap }: { cap: Cap }) {
   const draining = trip.drained_seq === null
   return (
     <div style={{ ...muted, lineHeight: 1.45 }}>
-      {would} at {credits(trip.total)}.{' '}
+      {would} at {credits(trip.total)} against a limit of {credits(trip.limit)}.{' '}
       {draining
         ? `${plural(trip.running.length, 'subagent')} still running; spend so far ${credits(trip.peak)}.`
         : trip.overshoot > 0
-          ? `Spend ran ${credits(trip.overshoot)} past the limit while running work finished.`
+          ? `Spend ended at ${credits(trip.peak)}, ${credits(trip.overshoot)} past the limit.`
           : 'Nothing was running, so nothing more was spent.'}
     </div>
   )
@@ -325,7 +352,7 @@ function RowActions({ session, editing, onEdit, onChanged }: { session: Session;
     }
   }
   const tripped = session.cap?.state === 'tripped'
-  const ownLoop = session.owned && session.run && session.run.loop_id
+  const ownLoop = session.owned && session.loop?.active === true
   return (
     <span style={{ display: 'inline-flex', gap: 6 }}>
       {tripped && (
@@ -465,7 +492,7 @@ function StartRun({ state, onStarted }: { state: State | null; onStarted: () => 
           Name (optional)
           <div style={{ display: 'flex' }}><Input value={title} onChange={event => setTitle(event.target.value)} maxLength={80} placeholder="Shown in the sidebar" /></div>
         </label>
-        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
+        <div style={{ display: 'grid', gap: 12, alignItems: 'start', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))' }}>
           <label style={field}>
             Credit limit
             <div style={{ display: 'flex' }}><Input type="number" min={1} value={limit} onChange={event => setLimit(event.target.value)} /></div>
@@ -563,7 +590,7 @@ function Limits() {
           <li style={item}><b>It can't refuse a turn before it starts</b>, except on work it owns. A Kiro Crew app has no hook in front of a turn. So a cap on your own loop is held by pausing the loop, and only while a Breaker page is open.</li>
           <li style={item}><b>It never cuts a running turn or subagent.</b> Spend can run past the limit while they finish. Breaker measures that and shows it.</li>
           <li style={item}><b>A subagent that finishes can still wake its session</b>, and that turn can start more subagents. Breaker stops the loop, not that wake.</li>
-          <li style={item}><b>A subagent that starts and ends between two looks</b> (about 20 seconds apart) is counted, and not tied to its session. It is listed as "Subagent, session unknown".</li>
+          <li style={item}><b>A subagent that starts and ends between two looks</b> (about 10 seconds apart) is counted, and not tied to its session. It is listed as "Subagent, session unknown".</li>
           <li style={item}><b>Credits only.</b> A harness that bills in dollars is listed and never capped.</li>
           <li style={item}><b>It stops nothing you type.</b> A message you send always runs.</li>
         </ul>

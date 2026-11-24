@@ -1,12 +1,12 @@
 import { jsxs as n, jsx as e, Fragment as J } from "react/jsx-runtime";
-import { useAppApi as O, useTheme as ee, useNotify as P, useNavBadge as te } from "@kirocrew/app-sdk";
-import { Card as T, CardTitle as K, Input as F, Btn as H, StatCard as L, PageHeader as ie, SegmentedControl as Q, Badge as I } from "@kirocrew/app-sdk/ui";
+import { useAppApi as O, useTheme as Z, useNotify as P, useNavBadge as ee } from "@kirocrew/app-sdk";
+import { Card as T, CardTitle as K, Input as F, Btn as H, StatCard as L, PageHeader as te, Badge as I, SegmentedControl as ie } from "@kirocrew/app-sdk/ui";
 import { useState as b, useCallback as X, useEffect as j, useMemo as ne, useRef as re, Fragment as ae } from "react";
 const le = new Intl.NumberFormat(void 0, { maximumFractionDigits: 0 }), oe = new Intl.NumberFormat(void 0, { maximumFractionDigits: 1 });
-function g(t) {
+function p(t) {
   return Number.isFinite(t) ? Math.abs(t) >= 100 ? le.format(t) : oe.format(t) : "-";
 }
-function Z(t) {
+function Q(t) {
   if (!t) return "";
   const a = new Date(t);
   if (Number.isNaN(a.getTime())) return t;
@@ -26,22 +26,22 @@ function se(t) {
   return Math.ceil(t / (a / 2)) * (a / 2);
 }
 function de() {
-  const t = O(), [a, c] = b("5000"), [r, l] = b(null), [h, f] = b(""), [d, y] = b(!1), u = X(
+  const t = O(), [a, c] = b("5000"), [r, l] = b(null), [u, f] = b(""), [d, g] = b(!1), y = X(
     async (v) => {
-      y(!0), f("");
+      g(!0), f("");
       try {
         l(await t.get(`/api/apps/breaker/replay?limit=${encodeURIComponent(v)}`));
-      } catch (w) {
-        f(w instanceof Error ? w.message : String(w));
+      } catch (k) {
+        f(k instanceof Error ? k.message : String(k));
       } finally {
-        y(!1);
+        g(!1);
       }
     },
     [t]
   );
   j(() => {
-    u("5000");
-  }, [u]);
+    y("5000");
+  }, [y]);
   const o = r == null ? void 0 : r.summary;
   return /* @__PURE__ */ n("div", { style: { display: "grid", gap: 16 }, children: [
     /* @__PURE__ */ n(T, { children: [
@@ -55,7 +55,7 @@ function de() {
         "form",
         {
           onSubmit: (v) => {
-            v.preventDefault(), u(a);
+            v.preventDefault(), y(a);
           },
           style: { display: "flex", gap: 8, alignItems: "center", maxWidth: 360 },
           children: [
@@ -65,7 +65,7 @@ function de() {
           ]
         }
       ),
-      h && /* @__PURE__ */ e("p", { style: { color: "var(--danger)", fontSize: 13, marginTop: 8 }, children: h })
+      u && /* @__PURE__ */ e("p", { style: { color: "var(--danger)", fontSize: 13, marginTop: 8 }, children: u })
     ] }),
     r && o && /* @__PURE__ */ n(J, { children: [
       /* @__PURE__ */ n("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))" }, children: [
@@ -73,27 +73,27 @@ function de() {
           L,
           {
             label: "Counting the session only",
-            value: o.session_only_tripped ? "Trips" : `${g(o.session_only_total)}: never trips`,
+            value: o.session_only_tripped ? "Trips" : `${p(o.session_only_total)}: never trips`,
             title: "What a cap sees when nothing ties a subagent to the session that started it"
           }
         ),
-        /* @__PURE__ */ e(L, { label: "Counting its subagents, no cap", value: g(o.uncapped_total) }),
+        /* @__PURE__ */ e(L, { label: "Counting its subagents, no cap", value: p(o.uncapped_total) }),
         /* @__PURE__ */ e(
           L,
           {
             label: "With Breaker",
-            value: o.tripped ? `${g(o.drained_total)}` : "Limit not reached",
+            value: o.tripped ? `${p(o.drained_total)}` : "Limit not reached",
             accent: !0,
             title: "Where spend stopped once the running work had drained"
           }
         ),
-        /* @__PURE__ */ e(L, { label: "Not spent", value: g(o.saved) })
+        /* @__PURE__ */ e(L, { label: "Not spent", value: p(o.saved) })
       ] }),
       /* @__PURE__ */ n(T, { children: [
         /* @__PURE__ */ e(K, { children: "Credits spent, cycle by cycle" }),
         /* @__PURE__ */ n("p", { style: { fontSize: 13, color: "var(--muted)", margin: "6px 0 4px", lineHeight: 1.5 }, children: [
-          o.tripped ? `The cap trips in cycle ${o.tripped_cycle} at ${g(o.tripped_total ?? 0)}. No new cycle starts, the subagents already running finish, and spend settles at ${g(o.drained_total)}, ${g(o.overshoot)} past the limit.` : "The limit is above everything this run spent, so the cap never trips.",
-          !o.session_only_tripped && ` Counting the session alone, the same limit is never reached: its own turns add up to ${g(o.session_only_total)}.`
+          o.tripped ? `The cap trips in cycle ${o.tripped_cycle} at ${p(o.tripped_total ?? 0)}. No new cycle starts, the subagents already running finish, and spend settles at ${p(o.drained_total)}, ${p(o.overshoot)} past the limit.` : "The limit is above everything this run spent, so the cap never trips.",
+          !o.session_only_tripped && ` Counting the session alone, the same limit is never reached: its own turns add up to ${p(o.session_only_total)}.`
         ] }),
         /* @__PURE__ */ e(ce, { replay: r })
       ] })
@@ -101,11 +101,11 @@ function de() {
   ] });
 }
 function ce({ replay: t }) {
-  const a = ee(), c = (a == null ? void 0 : a.mode) === "dark", [r, l] = b(null), h = t.steps, f = h.length - 1, d = ne(() => se(Math.max(t.limit, ...h.map((i) => i.with_subagents))), [t.limit, h]), y = (i) => m.left + i / Math.max(f, 1) * (_ - m.left - m.right), u = (i) => R - m.bottom - i / d * (R - m.top - m.bottom), o = (i) => c ? A[i].dark : A[i].light, v = (i) => h.map((s, B) => `${B ? "L" : "M"}${y(B).toFixed(1)},${u(s[i]).toFixed(1)}`).join(""), w = [0, 0.25, 0.5, 0.75, 1].map((i) => i * d), S = h.findIndex((i) => i.signals.includes("tripped")), x = A.map((i, s) => ({ index: s, name: i.name, value: h[f][i.key], at: u(h[f][i.key]) })).sort((i, s) => i.at - s.at);
+  const a = Z(), c = (a == null ? void 0 : a.mode) === "dark", [r, l] = b(null), u = t.steps, f = u.length - 1, d = ne(() => se(Math.max(t.limit, ...u.map((i) => i.with_subagents))), [t.limit, u]), g = (i) => m.left + i / Math.max(f, 1) * (_ - m.left - m.right), y = (i) => R - m.bottom - i / d * (R - m.top - m.bottom), o = (i) => c ? A[i].dark : A[i].light, v = (i) => u.map((s, B) => `${B ? "L" : "M"}${g(B).toFixed(1)},${y(s[i]).toFixed(1)}`).join(""), k = [0, 0.25, 0.5, 0.75, 1].map((i) => i * d), w = u.findIndex((i) => i.signals.includes("tripped")), x = A.map((i, s) => ({ index: s, name: i.name, value: u[f][i.key], at: y(u[f][i.key]) })).sort((i, s) => i.at - s.at);
   for (let i = 1; i < x.length; i += 1) x[i].at = Math.max(x[i].at, x[i - 1].at + 30);
-  const k = x[x.length - 1].at - (R - m.bottom);
-  k > 0 && x.forEach((i) => i.at -= k);
-  const p = r === null ? null : h[r], $ = [1, 10, 20, 30, 40, 50, 60].filter((i) => i <= t.cycles), z = (i) => h.findIndex((s) => s.cycle === i);
+  const S = x[x.length - 1].at - (R - m.bottom);
+  S > 0 && x.forEach((i) => i.at -= S);
+  const h = r === null ? null : u[r], $ = [1, 10, 20, 30, 40, 50, 60].filter((i) => i <= t.cycles), z = (i) => u.findIndex((s) => s.cycle === i);
   return /* @__PURE__ */ n("div", { children: [
     /* @__PURE__ */ n("div", { style: { display: "flex", gap: 18, flexWrap: "wrap", fontSize: 12, margin: "8px 0 2px" }, "aria-label": "Legend", children: [
       A.map((i, s) => /* @__PURE__ */ n("span", { style: { display: "inline-flex", alignItems: "center", gap: 6 }, children: [
@@ -131,44 +131,44 @@ function ce({ replay: t }) {
             l(U >= 0 && U <= f ? U : null);
           },
           children: [
-            w.map((i) => /* @__PURE__ */ n("g", { children: [
-              /* @__PURE__ */ e("line", { x1: m.left, x2: _ - m.right, y1: u(i), y2: u(i), stroke: "var(--border)", strokeWidth: 1 }),
-              /* @__PURE__ */ e("text", { x: m.left - 8, y: u(i) + 4, textAnchor: "end", fontSize: 11, fill: "var(--muted)", children: g(i) })
+            k.map((i) => /* @__PURE__ */ n("g", { children: [
+              /* @__PURE__ */ e("line", { x1: m.left, x2: _ - m.right, y1: y(i), y2: y(i), stroke: "var(--border)", strokeWidth: 1 }),
+              /* @__PURE__ */ e("text", { x: m.left - 8, y: y(i) + 4, textAnchor: "end", fontSize: 11, fill: "var(--muted)", children: p(i) })
             ] }, i)),
-            $.map((i) => /* @__PURE__ */ e("text", { x: y(Math.max(z(i), 0)), y: R - m.bottom + 16, textAnchor: "middle", fontSize: 11, fill: "var(--muted)", children: i }, i)),
+            $.map((i) => /* @__PURE__ */ e("text", { x: g(Math.max(z(i), 0)), y: R - m.bottom + 16, textAnchor: "middle", fontSize: 11, fill: "var(--muted)", children: i }, i)),
             /* @__PURE__ */ e("text", { x: (m.left + _ - m.right) / 2, y: R - 2, textAnchor: "middle", fontSize: 11, fill: "var(--muted)", children: "Cycle" }),
-            /* @__PURE__ */ e("line", { x1: m.left, x2: _ - m.right, y1: u(t.limit), y2: u(t.limit), stroke: "var(--muted)", strokeWidth: 1.5, strokeDasharray: "5 4" }),
-            /* @__PURE__ */ n("text", { x: m.left + 6, y: u(t.limit) - 6, fontSize: 11, fill: "var(--muted)", children: [
+            /* @__PURE__ */ e("line", { x1: m.left, x2: _ - m.right, y1: y(t.limit), y2: y(t.limit), stroke: "var(--muted)", strokeWidth: 1.5, strokeDasharray: "5 4" }),
+            /* @__PURE__ */ n("text", { x: m.left + 6, y: y(t.limit) - 6, fontSize: 11, fill: "var(--muted)", children: [
               "Limit ",
-              g(t.limit)
+              p(t.limit)
             ] }),
             A.map((i, s) => /* @__PURE__ */ e("path", { d: v(i.key), fill: "none", stroke: o(s), strokeWidth: 2, strokeLinejoin: "round", strokeLinecap: "round" }, i.key)),
-            S >= 0 && /* @__PURE__ */ n("g", { children: [
-              /* @__PURE__ */ e("circle", { cx: y(S), cy: u(h[S].capped), r: 5, fill: o(2), stroke: "var(--card, var(--bg))", strokeWidth: 2 }),
-              /* @__PURE__ */ n("text", { x: y(S) + 9, y: u(h[S].capped) - 9, fontSize: 11, fill: "var(--text)", children: [
+            w >= 0 && /* @__PURE__ */ n("g", { children: [
+              /* @__PURE__ */ e("circle", { cx: g(w), cy: y(u[w].capped), r: 5, fill: o(2), stroke: "var(--card, var(--bg))", strokeWidth: 2 }),
+              /* @__PURE__ */ n("text", { x: g(w) + 9, y: y(u[w].capped) - 9, fontSize: 11, fill: "var(--text)", children: [
                 "Trips, cycle ",
-                h[S].cycle
+                u[w].cycle
               ] })
             ] }),
             x.map((i) => /* @__PURE__ */ n("g", { children: [
               /* @__PURE__ */ e("line", { x1: _ - m.right + 4, x2: _ - m.right + 14, y1: i.at, y2: i.at, stroke: o(i.index), strokeWidth: 3, strokeLinecap: "round" }),
               /* @__PURE__ */ e("text", { x: _ - m.right + 20, y: i.at - 1, fontSize: 11, fill: "var(--muted)", children: i.name }),
-              /* @__PURE__ */ e("text", { x: _ - m.right + 20, y: i.at + 12, fontSize: 12, fontWeight: 600, fill: "var(--text)", children: g(i.value) })
+              /* @__PURE__ */ e("text", { x: _ - m.right + 20, y: i.at + 12, fontSize: 12, fontWeight: 600, fill: "var(--text)", children: p(i.value) })
             ] }, i.index)),
-            r !== null && p && /* @__PURE__ */ n("g", { pointerEvents: "none", children: [
-              /* @__PURE__ */ e("line", { x1: y(r), x2: y(r), y1: m.top, y2: R - m.bottom, stroke: "var(--muted)", strokeWidth: 1 }),
-              A.map((i, s) => /* @__PURE__ */ e("circle", { cx: y(r), cy: u(p[i.key]), r: 4, fill: o(s), stroke: "var(--card, var(--bg))", strokeWidth: 2 }, i.key))
+            r !== null && h && /* @__PURE__ */ n("g", { pointerEvents: "none", children: [
+              /* @__PURE__ */ e("line", { x1: g(r), x2: g(r), y1: m.top, y2: R - m.bottom, stroke: "var(--muted)", strokeWidth: 1 }),
+              A.map((i, s) => /* @__PURE__ */ e("circle", { cx: g(r), cy: y(h[i.key]), r: 4, fill: o(s), stroke: "var(--card, var(--bg))", strokeWidth: 2 }, i.key))
             ] })
           ]
         }
       ),
-      r !== null && p && /* @__PURE__ */ n(
+      r !== null && h && /* @__PURE__ */ n(
         "div",
         {
           style: {
             position: "absolute",
             top: 8,
-            left: `${Math.min(y(r) / _ * 100 + 2, 62)}%`,
+            left: `${Math.min(g(r) / _ * 100 + 2, 62)}%`,
             background: "var(--bg-elevated, var(--bg))",
             border: "1px solid var(--border)",
             borderRadius: 6,
@@ -181,16 +181,16 @@ function ce({ replay: t }) {
           children: [
             /* @__PURE__ */ n("div", { style: { fontWeight: 600, marginBottom: 4 }, children: [
               "Cycle ",
-              p.cycle,
+              h.cycle,
               ": ",
-              p.what
+              h.what
             ] }),
             A.map((i, s) => /* @__PURE__ */ n("div", { style: { display: "flex", justifyContent: "space-between", gap: 12 }, children: [
               /* @__PURE__ */ n("span", { style: { display: "inline-flex", alignItems: "center", gap: 6, color: "var(--muted)" }, children: [
                 /* @__PURE__ */ e("span", { style: { width: 10, height: 3, borderRadius: 2, background: o(s) } }),
                 i.name
               ] }),
-              /* @__PURE__ */ e("span", { style: { fontVariantNumeric: "tabular-nums" }, children: g(p[i.key]) })
+              /* @__PURE__ */ e("span", { style: { fontVariantNumeric: "tabular-nums" }, children: p(h[i.key]) })
             ] }, i.key))
           ]
         }
@@ -204,10 +204,10 @@ function ce({ replay: t }) {
           A.map((i) => /* @__PURE__ */ e("th", { style: { padding: "4px 8px", fontWeight: 500 }, children: i.name }, i.key))
         ] }) }),
         /* @__PURE__ */ e("tbody", { children: Array.from({ length: t.cycles }, (i, s) => s + 1).map((i) => {
-          const s = [...h].reverse().find((B) => B.cycle === i);
+          const s = [...u].reverse().find((B) => B.cycle === i);
           return s ? /* @__PURE__ */ n("tr", { style: { textAlign: "right", borderTop: "1px solid var(--border)" }, children: [
             /* @__PURE__ */ e("td", { style: { textAlign: "left", padding: "4px 8px" }, children: i }),
-            A.map((B) => /* @__PURE__ */ e("td", { style: { padding: "4px 8px" }, children: g(s[B.key]) }, B.key))
+            A.map((B) => /* @__PURE__ */ e("td", { style: { padding: "4px 8px" }, children: p(s[B.key]) }, B.key))
           ] }, i) : null;
         }) })
       ] }) })
@@ -241,30 +241,30 @@ function E(t) {
     }
   return a;
 }
-function We() {
-  const t = O(), a = P(), c = te(), [r, l] = b(null), [h, f] = b(""), [d, y] = b("sessions"), u = re(/* @__PURE__ */ new Set()), o = X(async () => {
+function Te() {
+  const t = O(), a = P(), c = ee(), [r, l] = b(null), [u, f] = b(""), [d, g] = b("sessions"), y = re(/* @__PURE__ */ new Set()), o = X(async () => {
     try {
       l(await t.get(`${M}/state`)), f("");
-    } catch (p) {
-      f(E(p));
+    } catch (h) {
+      f(E(h));
     }
   }, [t]);
   j(() => {
     o();
-    const p = window.setInterval(() => void o(), he);
-    return () => window.clearInterval(p);
+    const h = window.setInterval(() => void o(), he);
+    return () => window.clearInterval(h);
   }, [o]);
   const v = X(
-    async (p) => {
+    async (h) => {
       let $ = !0, z = "loop paused from the Breaker page; a turn already running is left to finish";
       try {
-        if (p.kind !== "pause_loop") throw new Error(`unknown action ${p.kind}`);
-        await t.patch(`/api/autonudge/${encodeURIComponent(p.loop_id)}`, { active: !1 });
+        if (h.kind !== "pause_loop") throw new Error(`unknown action ${h.kind}`);
+        await t.patch(`/api/autonudge/${encodeURIComponent(h.loop_id)}`, { active: !1 });
       } catch (i) {
         $ = !1, z = `the page could not pause the loop: ${E(i)}`;
       }
       try {
-        await t.post(`${M}/page-actions/${encodeURIComponent(p.id)}/done`, { ok: $, detail: z });
+        await t.post(`${M}/page-actions/${encodeURIComponent(h.id)}/done`, { ok: $, detail: z });
       } catch {
       }
       a($ ? "Breaker paused a loop that reached its credit limit." : z, { type: $ ? "success" : "error" }), o();
@@ -272,24 +272,24 @@ function We() {
     [t, a, o]
   );
   j(() => {
-    for (const p of (r == null ? void 0 : r.page_actions) ?? [])
-      u.current.has(p.id) || (u.current.add(p.id), v(p));
+    for (const h of (r == null ? void 0 : r.page_actions) ?? [])
+      y.current.has(h.id) || (y.current.add(h.id), v(h));
   }, [r, v]);
-  const w = (r == null ? void 0 : r.sessions) ?? [], S = w.filter((p) => p.cap && p.cap.limit > 0), x = S.filter((p) => {
+  const k = (r == null ? void 0 : r.sessions) ?? [], w = k.filter((h) => h.cap && h.cap.limit > 0), x = w.filter((h) => {
     var $;
-    return (($ = p.cap) == null ? void 0 : $.state) === "tripped";
-  }), k = x.filter((p) => {
+    return (($ = h.cap) == null ? void 0 : $.state) === "tripped";
+  }), S = x.filter((h) => {
     var $;
-    return (($ = p.cap) == null ? void 0 : $.mode) === "enforce";
+    return (($ = h.cap) == null ? void 0 : $.mode) === "enforce";
   }).length;
   return j(() => {
-    c(k);
-  }, [k, c]), /* @__PURE__ */ n(J, { children: [
-    /* @__PURE__ */ e(ie, { title: "Breaker", subtitle: "A circuit breaker for credits: a session is counted with the subagents it started" }),
+    c(S);
+  }, [S, c]), /* @__PURE__ */ n(J, { children: [
+    /* @__PURE__ */ e(te, { title: "Breaker", subtitle: "A circuit breaker for credits: a session is counted with the subagents it started" }),
     /* @__PURE__ */ n("div", { style: { padding: "0 24px 32px", overflowY: "auto", flex: 1, minHeight: 0 }, children: [
-      h && /* @__PURE__ */ n(V, { tone: "danger", children: [
+      u && /* @__PURE__ */ n(V, { tone: "danger", children: [
         "Breaker's backend did not answer: ",
-        h
+        u
       ] }),
       r && !r.meter.ok && /* @__PURE__ */ n(V, { tone: "danger", children: [
         "The usage log can't be read (",
@@ -302,52 +302,77 @@ function We() {
         "). Totals count finished turns only, and a subagent that finishes may not be tied to its session."
       ] }),
       /* @__PURE__ */ n("div", { style: { display: "grid", gap: 14, gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", margin: "4px 0 18px" }, children: [
-        /* @__PURE__ */ e(L, { label: "Credits counted", value: r ? g(r.grand_total) : null, accent: !0 }),
-        /* @__PURE__ */ e(L, { label: "Sessions", value: r ? w.length : null }),
+        /* @__PURE__ */ e(L, { label: "Credits counted", value: r ? p(r.grand_total) : null, accent: !0 }),
+        /* @__PURE__ */ e(L, { label: "Sessions", value: r ? k.length : null }),
         /* @__PURE__ */ e(
           L,
           {
             label: "Subagent credits tied to a session",
-            value: r ? g(r.coverage.linked_credits) : null,
+            value: r ? p(r.coverage.linked_credits) : null,
             title: r ? `${G(r.coverage.linked_runs, "subagent run")} tied to the session that started it` : void 0
           }
         ),
-        /* @__PURE__ */ e(L, { label: "Caps set", value: r ? S.length : null }),
+        /* @__PURE__ */ e(L, { label: "Caps set", value: r ? w.length : null }),
         /* @__PURE__ */ e(L, { label: "Tripped", value: r ? x.length : null })
       ] }),
       /* @__PURE__ */ e("div", { style: { marginBottom: 14 }, children: /* @__PURE__ */ e(
-        Q,
+        pe,
         {
-          ariaLabel: "Breaker views",
-          layoutId: "breaker-tabs",
           value: d,
-          onChange: y,
-          segments: [
+          onChange: g,
+          tabs: [
             { key: "sessions", label: "Sessions" },
-            { key: "start", label: "Start under a breaker" },
+            { key: "start", label: "New run" },
             { key: "replay", label: "Replay" },
             { key: "history", label: "History" },
             { key: "limits", label: "What it can't do" }
           ]
         }
       ) }),
-      d === "sessions" && /* @__PURE__ */ e(ue, { state: r, onChanged: o }),
-      d === "start" && /* @__PURE__ */ e(be, { state: r, onStarted: () => {
-        y("sessions"), o();
+      d === "sessions" && /* @__PURE__ */ e(ye, { state: r, onChanged: o }),
+      d === "start" && /* @__PURE__ */ e(ve, { state: r, onStarted: () => {
+        g("sessions"), o();
       } }),
       d === "replay" && /* @__PURE__ */ e(de, {}),
-      d === "history" && /* @__PURE__ */ e(we, { state: r }),
-      d === "limits" && /* @__PURE__ */ e(ke, {})
+      d === "history" && /* @__PURE__ */ e(xe, { state: r }),
+      d === "limits" && /* @__PURE__ */ e(Se, {})
     ] })
   ] });
+}
+function pe({ value: t, onChange: a, tabs: c }) {
+  return /* @__PURE__ */ e("div", { role: "tablist", "aria-label": "Breaker views", style: { display: "inline-flex", flexWrap: "wrap", gap: 2, padding: 3, border: "1px solid var(--border)", borderRadius: 8, background: "var(--card)" }, children: c.map((r) => {
+    const l = r.key === t;
+    return /* @__PURE__ */ e(
+      "button",
+      {
+        type: "button",
+        role: "tab",
+        "aria-selected": l,
+        onClick: () => a(r.key),
+        style: {
+          font: "inherit",
+          fontSize: 12,
+          whiteSpace: "nowrap",
+          cursor: "pointer",
+          padding: "5px 12px",
+          borderRadius: 6,
+          border: `1px solid ${l ? "var(--accent)" : "transparent"}`,
+          background: l ? "var(--bg-hover, transparent)" : "transparent",
+          color: l ? "var(--accent)" : "var(--text)"
+        },
+        children: r.label
+      },
+      r.key
+    );
+  }) });
 }
 function V({ tone: t, children: a }) {
   return /* @__PURE__ */ e("div", { role: "status", style: { border: `1px solid ${t === "danger" ? "var(--danger, #b91c1c)" : "var(--warn, #b45309)"}`, borderLeftWidth: 4, borderRadius: 6, padding: "10px 12px", fontSize: 13, margin: "0 0 12px", lineHeight: 1.5 }, children: a });
 }
-function pe(t) {
+function ue(t) {
   return t.title || t.session;
 }
-function ue({ state: t, onChanged: a }) {
+function ye({ state: t, onChanged: a }) {
   const [c, r] = b(null);
   return t ? t.sessions.length === 0 ? /* @__PURE__ */ n(T, { children: [
     /* @__PURE__ */ e(K, { children: "No spend yet" }),
@@ -370,41 +395,41 @@ function ue({ state: t, onChanged: a }) {
       /* @__PURE__ */ e("tbody", { children: t.sessions.map((l) => /* @__PURE__ */ n(ae, { children: [
         /* @__PURE__ */ n("tr", { style: { borderTop: "1px solid var(--border)" }, children: [
           /* @__PURE__ */ n("td", { style: { ...N, maxWidth: 320 }, children: [
-            /* @__PURE__ */ e("div", { style: { fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }, children: pe(l) }),
+            /* @__PURE__ */ e("div", { style: { fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis" }, children: ue(l) }),
             l.title && /* @__PURE__ */ e("div", { style: Y, children: l.session }),
             /* @__PURE__ */ n("div", { style: { display: "flex", gap: 6, flexWrap: "wrap", marginTop: 4 }, children: [
               l.owned && /* @__PURE__ */ e(I, { variant: "aim", title: "Started from Breaker; it owns this session", children: "Started from Breaker" }),
               l.orphan_run && /* @__PURE__ */ e(I, { variant: "muted", title: "A subagent whose session Breaker never saw: it started and ended between two looks", children: "Subagent, session unknown" }),
               l.bills_in_dollars && /* @__PURE__ */ e(I, { variant: "muted", title: "This harness bills in dollars. Breaker caps credits only.", children: "Bills in dollars: not capped" }),
               l.loop && /* @__PURE__ */ n(I, { variant: "muted", title: "A goal loop is armed on this session", children: [
-                l.loop.active ? "Loop running" : "Loop paused",
+                l.loop.active ? "Loop running" : l.loop.max_cycles > 0 && l.loop.cycle_count >= l.loop.max_cycles ? "Loop finished" : "Loop paused",
                 ", cycle ",
                 l.loop.cycle_count,
                 l.loop.max_cycles ? ` of ${l.loop.max_cycles}` : ""
               ] })
             ] })
           ] }),
-          /* @__PURE__ */ e("td", { style: q, children: g(l.own) }),
+          /* @__PURE__ */ e("td", { style: q, children: p(l.own) }),
           /* @__PURE__ */ n("td", { style: q, children: [
-            g(l.children),
+            p(l.children),
             /* @__PURE__ */ n("div", { style: C, children: [
               G(l.runs, "run"),
               l.running.length > 0 && `, ${l.running.length} running`
             ] })
           ] }),
           /* @__PURE__ */ n("td", { style: { ...q, fontWeight: 600 }, children: [
-            g(l.total),
+            p(l.total),
             l.dollars > 0 && /* @__PURE__ */ n("div", { style: C, children: [
               "+ $",
               l.dollars.toFixed(2)
             ] }),
-            /* @__PURE__ */ e("div", { style: C, children: Z(l.last_spend) })
+            /* @__PURE__ */ e("div", { style: C, children: Q(l.last_spend) })
           ] }),
           /* @__PURE__ */ e("td", { style: { ...N, minWidth: 190 }, children: /* @__PURE__ */ e(ge, { session: l }) }),
           /* @__PURE__ */ e("td", { style: N, children: l.cap && l.cap.limit > 0 ? l.cap.mode === "enforce" ? /* @__PURE__ */ e(I, { variant: D[l.label].variant, title: D[l.label].help, children: D[l.label].text }) : /* @__PURE__ */ e(I, { variant: "muted", title: "A shadow cap is measured the same way and stops nothing", children: "Shadow: stops nothing" }) : /* @__PURE__ */ e("span", { style: C, children: D[l.label].text.replace("Holds", "Would hold") }) }),
-          /* @__PURE__ */ e("td", { style: { ...N, whiteSpace: "nowrap", textAlign: "right" }, children: /* @__PURE__ */ e(me, { session: l, editing: c === l.session, onEdit: () => r(c === l.session ? null : l.session), onChanged: a }) })
+          /* @__PURE__ */ e("td", { style: { ...N, whiteSpace: "nowrap", textAlign: "right" }, children: /* @__PURE__ */ e(fe, { session: l, editing: c === l.session, onEdit: () => r(c === l.session ? null : l.session), onChanged: a }) })
         ] }),
-        c === l.session && /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: 7, style: { padding: "0 10px 14px" }, children: /* @__PURE__ */ e(fe, { session: l, onDone: async () => {
+        c === l.session && /* @__PURE__ */ e("tr", { children: /* @__PURE__ */ e("td", { colSpan: 7, style: { padding: "0 10px 14px" }, children: /* @__PURE__ */ e(be, { session: l, onDone: async () => {
           r(null), await a();
         } }) }) })
       ] }, l.session)) })
@@ -418,7 +443,7 @@ function ge({ session: t }) {
   const c = Math.min(t.total / a.limit, 1), r = a.state === "tripped", l = r ? "var(--danger, #b91c1c)" : a.state === "warned" ? "var(--warn, #b45309)" : "var(--accent)";
   return /* @__PURE__ */ n("div", { children: [
     /* @__PURE__ */ n("div", { style: { display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }, children: [
-      /* @__PURE__ */ e("span", { style: { fontVariantNumeric: "tabular-nums" }, children: g(a.limit) }),
+      /* @__PURE__ */ e("span", { style: { fontVariantNumeric: "tabular-nums" }, children: p(a.limit) }),
       r ? /* @__PURE__ */ e(I, { variant: "err", children: "Tripped" }) : a.state === "warned" ? /* @__PURE__ */ n(I, { variant: "warn", children: [
         "Past ",
         a.warn_pct,
@@ -426,68 +451,70 @@ function ge({ session: t }) {
       ] }) : /* @__PURE__ */ e(I, { variant: "muted", children: "Armed" })
     ] }),
     /* @__PURE__ */ e("div", { style: { height: 4, borderRadius: 2, background: "var(--border)", margin: "6px 0 4px", overflow: "hidden" }, "aria-hidden": !0, children: /* @__PURE__ */ e("div", { style: { width: `${c * 100}%`, height: "100%", background: l } }) }),
-    a.trip && /* @__PURE__ */ e(ye, { cap: a })
+    a.trip && /* @__PURE__ */ e(me, { cap: a })
   ] });
 }
-function ye({ cap: t }) {
+function me({ cap: t }) {
   const a = t.trip;
   if (!a) return null;
   const c = t.mode === "shadow" ? "Would have tripped" : "Tripped", r = a.drained_seq === null;
   return /* @__PURE__ */ n("div", { style: { ...C, lineHeight: 1.45 }, children: [
     c,
     " at ",
-    g(a.total),
+    p(a.total),
+    " against a limit of ",
+    p(a.limit),
     ".",
     " ",
-    r ? `${G(a.running.length, "subagent")} still running; spend so far ${g(a.peak)}.` : a.overshoot > 0 ? `Spend ran ${g(a.overshoot)} past the limit while running work finished.` : "Nothing was running, so nothing more was spent."
+    r ? `${G(a.running.length, "subagent")} still running; spend so far ${p(a.peak)}.` : a.overshoot > 0 ? `Spend ended at ${p(a.peak)}, ${p(a.overshoot)} past the limit.` : "Nothing was running, so nothing more was spent."
   ] });
 }
-function me({ session: t, editing: a, onEdit: c, onChanged: r }) {
-  var v;
-  const l = O(), h = P(), [f, d] = b(""), y = async (w, S, x) => {
+function fe({ session: t, editing: a, onEdit: c, onChanged: r }) {
+  var v, k;
+  const l = O(), u = P(), [f, d] = b(""), g = async (w, x, S) => {
     d(w);
     try {
-      const k = await l.post(`${M}${S}`, { session: t.session });
-      h(x(k), { type: "success" });
-    } catch (k) {
-      h(E(k), { type: "error" });
+      const h = await l.post(`${M}${x}`, { session: t.session });
+      u(S(h), { type: "success" });
+    } catch (h) {
+      u(E(h), { type: "error" });
     } finally {
       d(""), await r();
     }
-  }, u = ((v = t.cap) == null ? void 0 : v.state) === "tripped", o = t.owned && t.run && t.run.loop_id;
+  }, y = ((v = t.cap) == null ? void 0 : v.state) === "tripped", o = t.owned && ((k = t.loop) == null ? void 0 : k.active) === !0;
   return /* @__PURE__ */ n("span", { style: { display: "inline-flex", gap: 6 }, children: [
-    u && /* @__PURE__ */ e(H, { busy: f === "restart", onClick: () => void y("restart", "/restart", (w) => w.note ? `Restarted: ${w.note}.` : "Restarted. If spend is still over the limit, it trips again at once."), title: "Arm the cap again. Over the limit, it trips again at once.", children: "Restart" }),
-    o && !u && /* @__PURE__ */ e(H, { busy: f === "stop", onClick: () => void y("stop", "/runs/stop", () => "Loop removed. A turn already running is left to finish."), children: "Stop loop" }),
+    y && /* @__PURE__ */ e(H, { busy: f === "restart", onClick: () => void g("restart", "/restart", (w) => w.note ? `Restarted: ${w.note}.` : "Restarted. If spend is still over the limit, it trips again at once."), title: "Arm the cap again. Over the limit, it trips again at once.", children: "Restart" }),
+    o && !y && /* @__PURE__ */ e(H, { busy: f === "stop", onClick: () => void g("stop", "/runs/stop", () => "Loop removed. A turn already running is left to finish."), children: "Stop loop" }),
     /* @__PURE__ */ e(H, { onClick: c, children: a ? "Close" : t.cap && t.cap.limit > 0 ? "Change cap" : "Set cap" })
   ] });
 }
-function fe({ session: t, onDone: a }) {
+function be({ session: t, onDone: a }) {
   var x;
-  const c = O(), r = P(), [l, h] = b(t.cap && t.cap.limit > 0 ? String(t.cap.limit) : ""), [f, d] = b(((x = t.cap) == null ? void 0 : x.mode) ?? "shadow"), [y, u] = b(!1), o = Number(l), v = l.trim() !== "" && Number.isFinite(o) && o > 0, w = async () => {
-    u(!0);
+  const c = O(), r = P(), [l, u] = b(t.cap && t.cap.limit > 0 ? String(t.cap.limit) : ""), [f, d] = b(((x = t.cap) == null ? void 0 : x.mode) ?? "shadow"), [g, y] = b(!1), o = Number(l), v = l.trim() !== "" && Number.isFinite(o) && o > 0, k = async () => {
+    y(!0);
     try {
-      await c.put(`${M}/caps`, { session: t.session, limit: o, mode: f }), r(`Cap set at ${g(o)} credits.`, { type: "success" }), await a();
-    } catch (k) {
-      r(E(k), { type: "error" });
+      await c.put(`${M}/caps`, { session: t.session, limit: o, mode: f }), r(`Cap set at ${p(o)} credits.`, { type: "success" }), await a();
+    } catch (S) {
+      r(E(S), { type: "error" });
     } finally {
-      u(!1);
+      y(!1);
     }
-  }, S = async () => {
-    u(!0);
+  }, w = async () => {
+    y(!0);
     try {
       await c.post(`${M}/caps/remove`, { session: t.session }), r("Cap removed.", { type: "success" }), await a();
-    } catch (k) {
-      r(E(k), { type: "error" });
+    } catch (S) {
+      r(E(S), { type: "error" });
     } finally {
-      u(!1);
+      y(!1);
     }
   };
   return /* @__PURE__ */ n("div", { style: { border: "1px solid var(--border)", borderRadius: 6, padding: 12, display: "grid", gap: 10, maxWidth: 720 }, children: [
     /* @__PURE__ */ n("div", { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }, children: [
       /* @__PURE__ */ e("label", { htmlFor: `limit-${t.session}`, style: { fontSize: 13 }, children: "Credit limit for this session and its subagents" }),
-      /* @__PURE__ */ e("div", { style: { width: 140, display: "flex" }, children: /* @__PURE__ */ e(F, { id: `limit-${t.session}`, type: "number", min: 1, value: l, onChange: (k) => h(k.target.value), placeholder: "e.g. 5000" }) }),
+      /* @__PURE__ */ e("div", { style: { width: 140, display: "flex" }, children: /* @__PURE__ */ e(F, { id: `limit-${t.session}`, type: "number", min: 1, value: l, onChange: (S) => u(S.target.value), placeholder: "e.g. 5000" }) }),
       /* @__PURE__ */ e(
-        Q,
+        ie,
         {
           ariaLabel: "Cap mode",
           layoutId: `mode-${t.session}`,
@@ -505,33 +532,33 @@ function fe({ session: t, onDone: a }) {
       t.total > 0 && v && o <= t.total && " This session has already spent more than that, so the cap trips as soon as it is saved."
     ] }),
     /* @__PURE__ */ n("div", { style: { display: "flex", gap: 8 }, children: [
-      /* @__PURE__ */ e(H, { primary: !0, busy: y, disabled: !v, onClick: () => void w(), children: "Save cap" }),
-      t.cap && /* @__PURE__ */ e(H, { danger: !0, busy: y, onClick: () => void S(), children: "Remove cap" })
+      /* @__PURE__ */ e(H, { primary: !0, busy: g, disabled: !v, onClick: () => void k(), children: "Save cap" }),
+      t.cap && /* @__PURE__ */ e(H, { danger: !0, busy: g, onClick: () => void w(), children: "Remove cap" })
     ] })
   ] });
 }
-function be({ state: t, onStarted: a }) {
-  const c = O(), r = P(), [l, h] = b(""), [f, d] = b(""), [y, u] = b("500"), [o, v] = b("10"), [w, S] = b("60"), [x, k] = b(!1), p = (t == null ? void 0 : t.capabilities.chat_slots) ?? !0, $ = l.trim() !== "" && Number(y) > 0, z = async () => {
-    k(!0);
+function ve({ state: t, onStarted: a }) {
+  const c = O(), r = P(), [l, u] = b(""), [f, d] = b(""), [g, y] = b("500"), [o, v] = b("10"), [k, w] = b("60"), [x, S] = b(!1), h = (t == null ? void 0 : t.capabilities.chat_slots) ?? !0, $ = l.trim() !== "" && Number(g) > 0, z = async () => {
+    S(!0);
     try {
       const s = await c.post(`${M}/runs`, {
         prompt: l,
         title: f,
-        limit: Number(y),
+        limit: Number(g),
         max_cycles: Number(o),
-        idle_secs: Number(w)
+        idle_secs: Number(k)
       });
-      r(s.loop_note ? `Started, but no loop was armed: ${s.loop_note}` : "Started under a breaker. The session is listed under Breaker in the sidebar.", { type: s.loop_note ? "error" : "success" }), h(""), d(""), a();
+      r(s.loop_note ? `Started, but no loop was armed: ${s.loop_note}` : "Started under a breaker. The session is listed under Breaker in the sidebar.", { type: s.loop_note ? "error" : "success" }), u(""), d(""), a();
     } catch (s) {
       r(E(s), { type: "error" });
     } finally {
-      k(!1);
+      S(!1);
     }
   }, i = { display: "grid", gap: 4, fontSize: 13 };
   return /* @__PURE__ */ n(T, { children: [
     /* @__PURE__ */ e(K, { children: "Start work under a breaker" }),
     /* @__PURE__ */ e("p", { style: { ...C, fontSize: 13, lineHeight: 1.5, margin: "6px 0 14px", maxWidth: 760 }, children: "Breaker opens a session of its own, sends your prompt, and keeps it going with a goal loop. Because Breaker owns the session, the cap holds with no page open: when the session and its subagents reach the limit, the loop is removed before its next cycle. The turn that is running finishes." }),
-    !p && /* @__PURE__ */ e(V, { tone: "warn", children: "This Kiro Crew does not give apps chat sessions of their own, so Breaker can't own work here." }),
+    !h && /* @__PURE__ */ e(V, { tone: "warn", children: "This Kiro Crew does not give apps chat sessions of their own, so Breaker can't own work here." }),
     /* @__PURE__ */ n("div", { style: { display: "grid", gap: 12, maxWidth: 760 }, children: [
       /* @__PURE__ */ n("label", { style: i, children: [
         "Goal",
@@ -539,7 +566,7 @@ function be({ state: t, onStarted: a }) {
           "textarea",
           {
             value: l,
-            onChange: (s) => h(s.target.value),
+            onChange: (s) => u(s.target.value),
             rows: 5,
             placeholder: "What should the session work toward?",
             style: { background: "var(--bg-elevated, var(--bg))", color: "var(--text)", border: "1px solid var(--border)", borderRadius: 6, padding: "8px 12px", fontSize: 13, fontFamily: "inherit", resize: "vertical" }
@@ -550,10 +577,10 @@ function be({ state: t, onStarted: a }) {
         "Name (optional)",
         /* @__PURE__ */ e("div", { style: { display: "flex" }, children: /* @__PURE__ */ e(F, { value: f, onChange: (s) => d(s.target.value), maxLength: 80, placeholder: "Shown in the sidebar" }) })
       ] }),
-      /* @__PURE__ */ n("div", { style: { display: "grid", gap: 12, gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }, children: [
+      /* @__PURE__ */ n("div", { style: { display: "grid", gap: 12, alignItems: "start", gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))" }, children: [
         /* @__PURE__ */ n("label", { style: i, children: [
           "Credit limit",
-          /* @__PURE__ */ e("div", { style: { display: "flex" }, children: /* @__PURE__ */ e(F, { type: "number", min: 1, value: y, onChange: (s) => u(s.target.value) }) })
+          /* @__PURE__ */ e("div", { style: { display: "flex" }, children: /* @__PURE__ */ e(F, { type: "number", min: 1, value: g, onChange: (s) => y(s.target.value) }) })
         ] }),
         /* @__PURE__ */ n("label", { style: i, children: [
           "Most cycles",
@@ -562,14 +589,14 @@ function be({ state: t, onStarted: a }) {
         ] }),
         /* @__PURE__ */ n("label", { style: i, children: [
           "Seconds idle before the next cycle",
-          /* @__PURE__ */ e("div", { style: { display: "flex" }, children: /* @__PURE__ */ e(F, { type: "number", min: 30, max: 3600, value: w, onChange: (s) => S(s.target.value) }) })
+          /* @__PURE__ */ e("div", { style: { display: "flex" }, children: /* @__PURE__ */ e(F, { type: "number", min: 30, max: 3600, value: k, onChange: (s) => w(s.target.value) }) })
         ] })
       ] }),
-      /* @__PURE__ */ e("div", { children: /* @__PURE__ */ e(H, { primary: !0, busy: x, disabled: !$ || !p, onClick: () => void z(), children: "Start under a breaker" }) })
+      /* @__PURE__ */ e("div", { children: /* @__PURE__ */ e(H, { primary: !0, busy: x, disabled: !$ || !h, onClick: () => void z(), children: "Start under a breaker" }) })
     ] })
   ] });
 }
-const ve = {
+const we = {
   cap_set: "Cap set",
   cap_removed: "Cap removed",
   warned: "Warned",
@@ -581,10 +608,10 @@ const ve = {
   page_action_queued: "Waiting for a page",
   run_started: "Started under a breaker"
 };
-function we({ state: t }) {
-  const a = O(), [c, r] = b(null), [l, h] = b("");
+function xe({ state: t }) {
+  const a = O(), [c, r] = b(null), [l, u] = b("");
   j(() => {
-    a.get(`${M}/history?limit=200`).then((d) => r(d.events)).catch((d) => h(E(d)));
+    a.get(`${M}/history?limit=200`).then((d) => r(d.events)).catch((d) => u(E(d)));
   }, [a, t == null ? void 0 : t.now]);
   const f = new Map(((t == null ? void 0 : t.sessions) ?? []).map((d) => [d.session, d.title]));
   return l ? /* @__PURE__ */ e(V, { tone: "danger", children: l }) : c ? c.length === 0 ? /* @__PURE__ */ e(T, { children: /* @__PURE__ */ e("p", { style: { ...C, fontSize: 13 }, children: "Nothing has happened yet. Caps you set, trips and stops are listed here." }) }) : /* @__PURE__ */ e(T, { children: /* @__PURE__ */ n("table", { style: { borderCollapse: "collapse", width: "100%" }, children: [
@@ -594,22 +621,22 @@ function we({ state: t }) {
       /* @__PURE__ */ e("th", { style: W, children: "Session" }),
       /* @__PURE__ */ e("th", { style: W, children: "Detail" })
     ] }) }),
-    /* @__PURE__ */ e("tbody", { children: c.map((d, y) => /* @__PURE__ */ n("tr", { style: { borderTop: "1px solid var(--border)" }, children: [
-      /* @__PURE__ */ e("td", { style: { ...N, whiteSpace: "nowrap", color: "var(--muted)" }, children: Z(d.at) }),
+    /* @__PURE__ */ e("tbody", { children: c.map((d, g) => /* @__PURE__ */ n("tr", { style: { borderTop: "1px solid var(--border)" }, children: [
+      /* @__PURE__ */ e("td", { style: { ...N, whiteSpace: "nowrap", color: "var(--muted)" }, children: Q(d.at) }),
       /* @__PURE__ */ n("td", { style: { ...N, whiteSpace: "nowrap" }, children: [
-        ve[d.kind] ?? d.kind,
+        we[d.kind] ?? d.kind,
         d.mode === "shadow" && (d.kind === "tripped" || d.kind === "warned") ? " (shadow)" : ""
       ] }),
       /* @__PURE__ */ e("td", { style: N, children: f.get(d.session) || /* @__PURE__ */ e("span", { style: Y, children: d.session }) }),
-      /* @__PURE__ */ e("td", { style: { ...N, color: "var(--muted)" }, children: xe(d) })
-    ] }, `${d.at}-${y}`)) })
+      /* @__PURE__ */ e("td", { style: { ...N, color: "var(--muted)" }, children: ke(d) })
+    ] }, `${d.at}-${g}`)) })
   ] }) }) : /* @__PURE__ */ e(T, { children: /* @__PURE__ */ e("p", { style: C, children: "Loading…" }) });
 }
-function xe(t) {
+function ke(t) {
   const a = [];
-  return t.kind === "cap_set" && t.limit !== void 0 && a.push(`${g(t.limit)} credits, ${t.mode === "enforce" ? "enforced" : "shadow"}`), (t.kind === "tripped" || t.kind === "warned") && t.total !== void 0 && t.limit !== void 0 && a.push(`${g(t.total)} of ${g(t.limit)}`), t.kind === "drained" && t.overshoot !== void 0 && a.push(`${g(t.overshoot)} past the limit`), t.kind === "run_started" && t.limit !== void 0 && a.push(`limit ${g(t.limit)}`), t.detail && a.push(t.detail), a.join(". ");
+  return t.kind === "cap_set" && t.limit !== void 0 && a.push(`${p(t.limit)} credits, ${t.mode === "enforce" ? "enforced" : "shadow"}`), (t.kind === "tripped" || t.kind === "warned") && t.total !== void 0 && t.limit !== void 0 && a.push(`${p(t.total)} of ${p(t.limit)}`), t.kind === "drained" && t.overshoot !== void 0 && a.push(`${p(t.overshoot)} past the limit`), t.kind === "run_started" && t.limit !== void 0 && a.push(`limit ${p(t.limit)}`), t.detail && a.push(t.detail), a.join(". ");
 }
-function ke() {
+function Se() {
   const t = { fontSize: 13, lineHeight: 1.55, margin: "0 0 8px" };
   return /* @__PURE__ */ n("div", { style: { display: "grid", gap: 16, maxWidth: 820 }, children: [
     /* @__PURE__ */ n(T, { children: [
@@ -629,7 +656,7 @@ function ke() {
         ] }),
         /* @__PURE__ */ n("li", { style: t, children: [
           /* @__PURE__ */ e("b", { children: "A subagent that starts and ends between two looks" }),
-          ' (about 20 seconds apart) is counted, and not tied to its session. It is listed as "Subagent, session unknown".'
+          ' (about 10 seconds apart) is counted, and not tied to its session. It is listed as "Subagent, session unknown".'
         ] }),
         /* @__PURE__ */ n("li", { style: t, children: [
           /* @__PURE__ */ e("b", { children: "Credits only." }),
@@ -654,5 +681,5 @@ function ke() {
   ] });
 }
 export {
-  We as default
+  Te as default
 };

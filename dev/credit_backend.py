@@ -12,7 +12,9 @@ Point a development gateway at it and no account, sign-in or credit is used:
     KIROCREW_KIRO_BIN=<a script that runs: python dev/credit_backend.py %*>
 
 Each turn bills ``BREAKER_FAKE_CREDITS`` credits (default 12). A prompt that
-contains ``credits=40`` bills 40 instead.
+contains ``credits=40`` bills 40 instead. A prompt that contains ``sleep=30``
+bills half at once, waits 30 seconds and bills the rest when it answers, so a
+turn or a subagent can be watched while it is still running.
 
 A development tool only. It imports ``kiro_crew``, which the app itself never
 does, and it must run under the Python that has Kiro Crew installed.
@@ -22,41 +24,58 @@ from __future__ import annotations
 
 import os
 import re
+import time
 from typing import Any
 
 from kiro_crew.testing import fake_acp_backend as fake
 
 DEFAULT_CREDITS = float(os.environ.get("BREAKER_FAKE_CREDITS", "12") or 12)
 ASKED = re.compile(r"credits=(\d+(?:\.\d+)?)")
+WAIT = re.compile(r"sleep=(\d+(?:\.\d+)?)")
+MAX_WAIT_SECS = 300.0
 
 _prompt: dict[str, Any] = {"request": None, "session": "", "credits": DEFAULT_CREDITS}
 _handle = fake._handle
 _result = fake._result
 
 
+def bill(amount: float) -> None:
+    """Report credits for the prompt in flight, the way kiro-cli does."""
+    fake._notify(
+        "_kiro.dev/metadata",
+        {
+            "sessionId": _prompt["session"],
+            "meteringUsage": [{"unit": "credit", "value": amount}],
+        },
+    )
+
+
 def handle(message: dict[str, Any]) -> None:
     """Note which prompt is being answered, then let the fake backend answer it."""
     if message.get("method") == "session/prompt":
         params = message.get("params") or {}
-        asked = ASKED.findall(fake._prompt_text(params))
+        text = fake._prompt_text(params)
+        asked = ASKED.findall(text)
+        wait = WAIT.findall(text)
         _prompt.update(
             request=message.get("id"),
             session=str(params.get("sessionId") or ""),
             credits=float(asked[-1]) if asked else DEFAULT_CREDITS,
         )
+        if wait:
+            # Crew adds up a turn's credit reports, so half now and half at the
+            # end is the whole amount. Nothing else is heard while this waits.
+            first = round(_prompt["credits"] / 2, 3)
+            bill(first)
+            _prompt["credits"] -= first
+            time.sleep(min(float(wait[-1]), MAX_WAIT_SECS))
     _handle(message)
 
 
 def result(request_id: Any, payload: dict[str, Any]) -> None:
     """Bill the turn just before its result goes out, as kiro-cli does."""
     if request_id == _prompt["request"] and isinstance(payload, dict) and "stopReason" in payload:
-        fake._notify(
-            "_kiro.dev/metadata",
-            {
-                "sessionId": _prompt["session"],
-                "meteringUsage": [{"unit": "credit", "value": _prompt["credits"]}],
-            },
-        )
+        bill(_prompt["credits"])
         _prompt["request"] = None
     _result(request_id, payload)
 

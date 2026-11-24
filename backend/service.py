@@ -32,7 +32,7 @@ from .runs import STOP_REASON, RunRefused, Runs
 
 VERSION = "0.1.0"
 POLL_SECS = 5.0
-LIVE_SECS = 20.0
+LIVE_SECS = 10.0
 SAVE_FILE = "breaker.json"
 EVENT_LIMIT = 500
 PAGE_RETRY_SECS = 60.0

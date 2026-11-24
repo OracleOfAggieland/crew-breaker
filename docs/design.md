@@ -9,12 +9,13 @@ app.json                  the manifest
 backend/
   breaker_core/           the accounting and the cap: pure Python, no I/O
   routes.py               the app's HTTP routes, served inside the gateway
-  meter.py                reads Crew's usage log and the running subagents
+  service.py              the one running Breaker: reads, decides, stops, saves
+  meter.py                reads Crew's usage log, the running subagents and the goal loops
   runs.py                 work Breaker starts and owns
 ui/
   src/                    the page (React, on the Crew app SDK)
   dist/index.mjs          the built page, committed
-dev/                      a stand-in model backend that reports credits, and a seed script
+dev/                      a stand-in model backend that reports credits, and the icon's generator
 tests/                    pytest and Hypothesis
 ```
 
@@ -50,7 +51,8 @@ A cap in `shadow` mode is evaluated the same way and stops nothing.
 - A message the owner types is never refused.
 - Unreadable meter data stops nothing. The page shows the meter as unreadable.
 - Credits only. A session that has billed dollars and no credits is marked as not enforced.
-- No private Crew internals: no `kiro_crew` imports, no reaching through `ctx.http_app`. If a route, a field or a `ctx` handle is missing, that feature is off and the page says so.
+- No private Crew internals: no `kiro_crew` imports, no reaching through `ctx.http_app`. The dashboard state is touched only to hand it to the chat-slot handle, which asks for it. If a route, a field or a `ctx` handle is missing, that feature is off and the page says so.
+- Every route is for the owner only (`ctx.require_owner`).
 - Breaker writes only to its own data folder.
 
 ## The backend's HTTP routes
@@ -63,6 +65,7 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
 {
   "version": "0.1.0",
   "now": "2026-11-24T08:00:00+00:00",
+  "usage_log": "the folder of usage files being read",
   "meter": {"ok": true, "note": "", "last_read": "2026-11-24T07:59:50+00:00", "live_ok": true, "live_note": ""},
   "capabilities": {"chat_slots": true, "live_runs": true, "loops": true},
   "sessions": [
@@ -71,11 +74,12 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
       "title": "",
       "own": 120.5, "children": 410.0, "total": 530.5, "dollars": 0.0,
       "runs": 3, "running": ["run session key"],
-      "surface": "dashboard", "app": "",
+      "surface": "dashboard", "app": "", "last_spend": "2026-11-24T07:46:09+00:00",
       "orphan_run": false, "bills_in_dollars": false,
       "owned": false,
       "label": "while_open",
       "loop": {"id": "loop id", "active": true, "cycle_count": 4, "max_cycles": 50},
+      "run": null,
       "cap": {
         "session": "slot key", "limit": 500, "mode": "enforce", "warn_pct": 80,
         "state": "tripped",
@@ -92,7 +96,7 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
 }
 ```
 
-- `loop` and `cap` are `null` when there is none. `sessions` is every session Breaker has seen spend on, newest spend first.
+- `loop`, `run` and `cap` are `null` when there is none. `run` is set on work Breaker started: `{"session", "title", "max_cycles", "idle_secs", "nudge", "loop_id", "loop_note", "cycles_done", "stopped"}`. `sessions` is every session Breaker has seen spend on, newest spend first.
 - `page_actions` are stops that need the owner's authority. The page carries each one out and reports back.
 
 ### Caps
@@ -100,10 +104,10 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
 | Route | Body | Answer |
 |---|---|---|
 | `PUT /caps` | `{"session", "limit", "mode": "shadow" or "enforce", "warn_pct"}` | `{"ok": true, "cap": {...}}` |
-| `DELETE /caps` | `{"session"}` | `{"ok": true}` |
-| `POST /restart` | `{"session"}` | `{"ok": true, "signals": ["tripped"]}` |
+| `POST /caps/remove` | `{"session"}` | `{"ok": true}` |
+| `POST /restart` | `{"session"}` | `{"ok": true, "signals": ["tripped"], "note": ""}` |
 
-`limit` must be a number. `0` turns the cap off without removing it.
+`limit` must be a number; text that looks like a number is refused. A restart on work Breaker started arms its loop again for the cycles that were left. A restart while the total is still past the limit trips again at once, so raise the limit first.
 
 ### Page actions
 
@@ -111,7 +115,7 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
 
 ### History
 
-`GET /history?limit=100` answers `{"events": [{"seq", "at", "kind", "session", "total", "limit", "overshoot", "mode", "detail"}]}`, newest first. `kind` is one of `cap_set`, `cap_removed`, `warned`, `tripped`, `drained`, `restarted`, `stopped`, `stop_failed`, `page_action_done`.
+`GET /history?limit=100` answers `{"events": [{"seq", "at", "kind", "session", "total", "limit", "overshoot", "mode", "detail"}]}`, newest first. `kind` is one of `cap_set`, `cap_removed`, `warned`, `tripped`, `drained`, `restarted`, `run_started`, `stopped`, `stop_failed`, `page_action_queued`.
 
 ### Replay
 
@@ -121,20 +125,20 @@ All under `/api/apps/breaker`. Bodies and answers are JSON.
 
 | Route | Body | Answer |
 |---|---|---|
-| `POST /runs` | `{"prompt", "limit", "max_cycles", "agent"}` | `{"ok": true, "session": "slot key"}` or `{"ok": false, "error": ""}` |
-| `POST /runs/stop` | `{"session"}` | `{"ok": true}` |
+| `POST /runs` | `{"prompt", "limit", "title", "max_cycles", "idle_secs", "nudge"}` | `{"ok": true, "session": "slot key", "loop_note": ""}` |
+| `POST /runs/stop` | `{"session"}` | `{"ok": true, "note": ""}`, or 409 when there was no loop to stop |
 
-A run is a chat slot Breaker owns, with a cap in `enforce` mode. Between cycles Breaker checks the cap, and it does not start the next cycle once the cap has tripped.
+A run is a chat slot Breaker owns (`breaker-<id>`), with a cap in `enforce` mode and a goal loop Breaker armed through its chat-slot handle. When the cap trips, Breaker removes that loop with the stop reason `credit_cap`, so no further cycle starts. If a loop shows up on a tripped run again, it is removed again.
 
 Errors answer with a 4xx status and `{"ok": false, "error": "what was wrong"}`.
 
 ## The meter
 
 - **Settled spend:** the backend reads the usage log files directly, remembering how far it got in each. Only whole lines are read. Crew's own `pipeline-conductor` skill reads the same files the same way.
-- **Running subagents:** `GET /api/sessions/memory` with the app's token, at most once a minute. It lists only runs that are running, so a run that starts and ends between two looks is counted but not tied to a parent.
+- **Running subagents:** `GET /api/sessions/memory` with the app's token, every 10 seconds. It lists only runs that are running, and a subagent's usage row names no parent, so the link has to be caught while the run is alive. A run that starts and ends between two looks is counted but not tied to a parent.
 - **Goal loops:** `GET /api/autonudge` with the app's token.
 - If the usage log can't be read, `meter.ok` is false and nothing trips. If the running-subagent route can't be read, `meter.live_ok` is false and totals fall back to settled rows.
 
 ## Testing without credits
 
-Crew's bundled fake backend reports no credits. `dev/` holds a stand-in that reports them, and a script that appends usage rows to a data home, so every path can be exercised for nothing.
+Crew's bundled fake backend reports no credits. `dev/credit_backend.py` wraps it and reports them the way kiro-cli does, so a development gateway writes real usage rows and every path can be exercised for nothing. A prompt can set what its turn bills (`credits=40`) and how long it runs (`sleep=30`).
